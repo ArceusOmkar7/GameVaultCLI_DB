@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.project.gamevaultcli.management;
 
 import com.project.gamevaultcli.entities.User;
@@ -27,7 +23,15 @@ public class UserManagement {
         return user;
     }
 
-    public List<User> getAllUsers() {
+    public User login(String email, String password) throws UserNotFoundException {
+        User user = userStorage.findByEmail(email);
+        if (user == null || !user.getPassword().equals(password)) {
+            throw new UserNotFoundException("Invalid email or password");
+        }
+        return user;
+    }
+
+    public List<User> getAllUsers() {    
         return userStorage.findAll();
     }
 

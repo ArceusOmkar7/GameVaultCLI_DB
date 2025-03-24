@@ -57,9 +57,9 @@ public class GameVaultMenu {
                     case 4:
                         placeOrder();
                         break;
-                    case 5:
-                        createTransaction();
-                        break;
+                    //case 5:
+                    //    createTransaction(); //No longer needs createTransaction()
+                    //    break;
                     case 6:
                         listGames();
                         break;
@@ -101,7 +101,7 @@ public class GameVaultMenu {
         System.out.println("2. Create Game");
         System.out.println("3. Add Game to Cart");
         System.out.println("4. Place Order");
-        System.out.println("5. Create Transaction");
+        //System.out.println("5. Create Transaction"); //No Longer Creating Transactions
         System.out.println("6. List Games");
         System.out.println("7. List Users");
         System.out.println("8. View Orders");
@@ -165,7 +165,7 @@ public class GameVaultMenu {
             scanner.nextLine();
 
             Game game = gameManagement.getGame(gameId);
-            cartManagement.addGameToCart(currentUser.getUserId(), game);
+            cartManagement.addGameToCart(currentUser.getUserId(), gameId);
             System.out.println("Added " + game.getTitle() + " to cart for user " + currentUser.getUsername());
         } catch (GameNotFoundException e) {
             System.out.println("Game not found with ID: " + e.getMessage());
@@ -189,26 +189,26 @@ public class GameVaultMenu {
         }
     }
 
-    private void createTransaction() {
-        try {
-            System.out.print("Enter User ID: ");
-            int userId = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-            System.out.print("Enter Game ID: ");
-            int gameId = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-            System.out.print("Enter Transaction Type: ");
-            String transactionType = scanner.nextLine();
-            System.out.print("Enter Amount: ");
-            Float amount = scanner.nextFloat();
-            scanner.nextLine(); // Consume newline
+    //private void createTransaction() {
+    //    try {
+    //        System.out.print("Enter User ID: ");
+    //        int userId = scanner.nextInt();
+    //        scanner.nextLine(); // Consume newline
+    //        System.out.print("Enter Game ID: ");
+    //        int gameId = scanner.nextInt();
+    //        scanner.nextLine(); // Consume newline
+    //        System.out.print("Enter Transaction Type: ");
+    //        String transactionType = scanner.nextLine();
+    //        System.out.print("Enter Amount: ");
+    //        Float amount = scanner.nextFloat();
+    //        scanner.nextLine(); // Consume newline
 
-            transactionManagement.addTransaction(new Transaction(3, userId, gameId, transactionType, amount, java.time.LocalDateTime.now()));
-            System.out.println("Transaction created");
-        } catch (Exception e) {
-            System.out.println("Error creating Transaction: " + e.getMessage());
-        }
-    }
+    //        transactionManagement.addTransaction(new Transaction(3, userId, gameId, transactionType, amount, java.time.LocalDateTime.now()));
+    //        System.out.println("Transaction created");
+    //    } catch (Exception e) {
+    //        System.out.println("Error creating Transaction: " + e.getMessage());
+    //    }
+    //}
 
     private void listGames() {
         try {
@@ -265,7 +265,7 @@ public class GameVaultMenu {
         try {
             List<Transaction> allTransactions = transactionManagement.getAllTransactions();
             System.out.println("\n--- Transactions List ---");
-            List<String> columnNames = Arrays.asList("transactionId", "userId", "gameId", "transactionType", "amount", "transactionDate");
+            List<String> columnNames = Arrays.asList("transactionId", "orderId", "userId", "transactionType", "amount", "transactionDate");
             List<Transaction> userTransactions = new ArrayList<>();
 
             for (Transaction transaction : allTransactions) {
@@ -282,19 +282,20 @@ public class GameVaultMenu {
 
     private void login() {
         try {
-            System.out.print("Enter User ID to login: ");
-            int userId = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            System.out.print("Enter email: ");
+            String email = scanner.nextLine();
+            System.out.print("Enter password: ");
+            String password = scanner.nextLine();
 
-            User user = vaultManager.login(userId); // Use the login method in GameVaultManager
+            User user = vaultManager.login(email, password); // Use the login method in GameVaultManager
             if (user != null) {
                 currentUser = user;
                 System.out.println("Logged in as: " + user.getUsername());
             } else {
-                System.out.println("Invalid User ID.");
+                System.out.println("Invalid email or password.");
             }
         } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a number.");
+            System.out.println("Invalid input. Please enter a valid email and password.");
             scanner.nextLine(); // Clear the invalid input
         } catch (UserNotFoundException e) {
             System.out.println(e.getMessage()); // User not found message

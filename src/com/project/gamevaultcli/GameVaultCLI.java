@@ -12,30 +12,39 @@ import com.project.gamevaultcli.storage.GameStorage;
 import com.project.gamevaultcli.storage.OrderStorage;
 import com.project.gamevaultcli.storage.TransactionStorage;
 import com.project.gamevaultcli.storage.UserStorage;
+import com.project.gamevaultcli.utils.DBUtil; // Import DBUtil
+import java.io.IOException;
+import java.sql.SQLException;
 
 public class GameVaultCLI {
 
     public static void main(String[] args) {
-        // Initialize Storages
-        UserStorage userStorage = new UserStorage();
-        GameStorage gameStorage = new GameStorage();
-        CartStorage cartStorage = new CartStorage();
-        OrderStorage orderStorage = new OrderStorage();
-        TransactionStorage transactionStorage = new TransactionStorage();
+        try {
+            // Initialize Storages
+            UserStorage userStorage = new UserStorage();
+            GameStorage gameStorage = new GameStorage();
+            CartStorage cartStorage = new CartStorage(gameStorage);
+            OrderStorage orderStorage = new OrderStorage();
+            TransactionStorage transactionStorage = new TransactionStorage();
 
-        // Initialize Managements
-        UserManagement userManagement = new UserManagement(userStorage);
-        GameManagement gameManagement = new GameManagement(gameStorage);
-        CartManagement cartManagement = new CartManagement(cartStorage);
-        OrderManagement orderManagement = new OrderManagement(orderStorage, cartStorage, userStorage);
-        TransactionManagement transactionManagement = new TransactionManagement(transactionStorage);
+            // Initialize Managements
+            UserManagement userManagement = new UserManagement(userStorage);
+            GameManagement gameManagement = new GameManagement(gameStorage);
+            CartManagement cartManagement = new CartManagement(cartStorage);
+            TransactionManagement transactionManagement = new TransactionManagement(transactionStorage);
+            OrderManagement orderManagement = new OrderManagement(orderStorage, cartStorage, userStorage, transactionManagement); // Modified
 
-        // Initialize and load predefined data using the GameVaultManager
-        GameVaultManagement vaultManager = new GameVaultManagement(userManagement, gameManagement, orderManagement, transactionManagement);
-        vaultManager.initializeData();
+            // Initialize and load predefined data using the GameVaultManager
+            GameVaultManagement vaultManager = new GameVaultManagement(userManagement, gameManagement, orderManagement, transactionManagement);
+            vaultManager.initializeData();
 
-        //Create and run the menu
-        GameVaultMenu menu = new GameVaultMenu(userManagement, gameManagement, cartManagement, orderManagement, transactionManagement, vaultManager);
-        menu.run();
+            // Create and run the menu
+            GameVaultMenu menu = new GameVaultMenu(userManagement, gameManagement, cartManagement, orderManagement, transactionManagement, vaultManager);
+            menu.run();
+
+        } finally {
+            // Ensure database connection is closed when the application exits
+            DBUtil.closeConnection();
+        }
     }
 }

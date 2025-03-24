@@ -44,8 +44,8 @@ public class GameVaultManagement {
 
             // Predefined Orders - will need to manually create cart and place order
             // Predefined Transactions
-            Transaction transaction1 = new Transaction(1, user1.getUserId(), game1.getGameId(), "Purchase", 52.3f, LocalDateTime.now());
-            transactionManagement.addTransaction(transaction1);
+            //Transaction transaction1 = new Transaction(1, user1.getUserId(), game1.getGameId(), "Purchase", 52.3f, LocalDateTime.now());
+            //transactionManagement.addTransaction(transaction1);
 
         } catch (InvalidUserDataException e) {
             System.out.println("Error initializing data: " + e.getMessage());
@@ -53,11 +53,8 @@ public class GameVaultManagement {
     }
 
     // Add login method to GameVaultManager
-    public User login(int userId) throws UserNotFoundException {
-        User user = userManagement.getUser(userId);
-        if (user == null) {
-            throw new UserNotFoundException("User not found with ID: " + userId);
-        }
+    public User login(String email, String password) throws UserNotFoundException {
+        User user = userManagement.login(email, password);
         this.currentUser = user;
         return user;
     }
@@ -65,5 +62,9 @@ public class GameVaultManagement {
     // Add logout method to GameVaultManager
     public void logout() {
         this.currentUser = null;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
     }
 }

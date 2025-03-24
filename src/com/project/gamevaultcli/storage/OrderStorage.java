@@ -1,51 +1,80 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.project.gamevaultcli.storage;
 
-import com.project.gamevaultcli.entities.Game;
 import com.project.gamevaultcli.entities.Order;
 import com.project.gamevaultcli.interfaces.StorageInterface;
+import com.project.gamevaultcli.utils.DBUtil;
 
-import java.util.*;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.List;
 
 public class OrderStorage implements StorageInterface<Order, Integer>{
 
-    private final Map<Integer, Order> orders = new HashMap<>(); // In-memory storage
-
-    public OrderStorage() {
-        // Initialize with some hardcoded data
-        List<Game> games1 = new ArrayList<>();
-        games1.add(new Game(1, "Game 1", "Description 1", "Developer 1", "PC", 20.0f, null));
-        orders.put(1, new Order(1, 1, games1, 20.0, new Date()));
-    }
-
     @Override
     public Order findById(Integer orderId) {
-        return orders.get(orderId);
+        String sql = "SELECT * FROM Orders WHERE orderId = ?";
+        try {
+            List<Order> orders = DBUtil.executeQuery(sql, rs -> mapResultSetToOrder(rs), orderId);
+            return orders.isEmpty() ? null : orders.get(0);
+        } catch (SQLException | IOException e) {
+            System.err.println("Error finding order by ID: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<Order> findAll() {
-        return new ArrayList<>(orders.values());
+        String sql = "SELECT * FROM Orders";
+        try {
+            return DBUtil.executeQuery(sql, rs -> mapResultSetToOrder(rs));
+        } catch (SQLException | IOException e) {
+            System.err.println("Error finding all orders: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public void save(Order order) {
-        int nextId = orders.keySet().stream().max(Integer::compare).orElse(0) + 1;
-        order.setOrderId(nextId);
-        orders.put(nextId, order);
+        String sql = "INSERT INTO Orders (userId, totalAmount, orderDate) VALUES (?, ?, ?)";
+        try (ResultSet generatedKeys = DBUtil.executeInsert(sql, order.getUserId(), order.getTotalAmount(), new Timestamp(order.getOrderDate().getTime()))) {
+
+            if (generatedKeys.next()) {
+                order.setOrderId(generatedKeys.getInt(1));
+            }
+        } catch (SQLException | IOException e) {
+            System.err.println("Error saving order: " + e.getMessage());
+        }
     }
 
     @Override
     public void update(Order order) {
-        // Assuming the order already exists.  If not, this will overwrite.
-        orders.put(order.getOrderId(), order);
+        String sql = "UPDATE Orders SET userId = ?, totalAmount = ?, orderDate = ? WHERE orderId = ?";
+        try {
+            DBUtil.executeUpdate(sql, order.getUserId(), order.getTotalAmount(), new Timestamp(order.getOrderDate().getTime()), order.getOrderId());
+        } catch (SQLException | IOException e) {
+            System.err.println("Error updating order: " + e.getMessage());
+        }
     }
 
     @Override
     public void delete(Integer orderId) {
-        orders.remove(orderId);
+        String sql = "DELETE FROM Orders WHERE orderId = ?";
+        try {
+            DBUtil.executeUpdate(sql, orderId);
+        } catch (SQLException | IOException e) {
+            System.err.println("Error deleting order: " + e.getMessage());
+        }
+    }
+
+    private Order mapResultSetToOrder(ResultSet rs) throws SQLException {
+        Order order =  new Order();
+        order.setOrderId(rs.getInt("orderId"));
+        order.setUserId(rs.getInt("userId"));
+        order.setTotalAmount(rs.getDouble("totalAmount"));
+        order.setOrderDate(rs.getTimestamp("orderDate"));
+        //need games table to get games
+        return order;
     }
 }
