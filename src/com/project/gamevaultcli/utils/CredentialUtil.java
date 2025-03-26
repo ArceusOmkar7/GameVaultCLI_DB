@@ -44,7 +44,7 @@ public class CredentialUtil {
         System.out.println("Database credentials file not found. Please enter database details:");
         System.out.print("Enter database URL (e.g., jdbc:mysql://localhost:3306/gamevault): ");
         String dbUrl = scanner.nextLine();
-        System.out.print("Enter database user: ");
+        System.out.print("Enter database username: ");
         String dbUser = scanner.nextLine();
         System.out.print("Enter database password: ");
         String dbPassword = scanner.nextLine();
