@@ -50,111 +50,109 @@ public class GameVaultMenu {
                         break;
                     case 2:
                         createGame();
-                        break;
                     case 3:
-                        addGameToCart();
-                        break;
-                    case 4:
-                        placeOrder();
-                        break;
-                    //case 5:
-                    //    createTransaction(); //No longer needs createTransaction()
-                    //    break;
-                    case 6:
-                        listGames();
-                        break;
-                    case 7:
-                        listUsers();
-                        break;
-                    case 8:
-                        viewOrders();
-                        break;
-                    case 9:
-                        viewTransactions();
-                        break;
-                    case 10:
-                        login();
-                        break;
-                    case 11:
-                        logout();
-                        break;
-                    case 0:
-                        running = false;
-                        System.out.println("Exiting Game Vault CLI...");
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine(); // Clear the invalid input
-            } catch (Exception e) {
-                System.out.println("An unexpected error occurred: " + e.getMessage());
-            }
-        }
-    }
+                         addGameToCart();
+                         break;
+                     case 4:
+                         placeOrder();
+                         break;
+                     case 5:
+                         viewCart();
+                         break;
+                     case 6:
+                         listGames();
+                         break;
+                     case 7:
+                         listUsers();
+                         break;
+                     case 8:
+                         viewOrders();
+                         break;
+                     case 9:
+                         viewTransactions();
+                         break;
+                     case 10:
+                         login();
+                         break;
+                     case 11:
+                         logout();
+                         break;
+                     case 0:
+                         running = false;
+                         System.out.println("Exiting Game Vault CLI...");
+                         break;
+                     default:
+                         System.out.println("Invalid choice. Please try again.");
+                 }
+             } catch (InputMismatchException e) {
+                 System.out.println("Invalid input. Please enter a number.");
+                 scanner.nextLine(); // Clear the invalid input
+             } catch (Exception e) {
+                 System.out.println("An unexpected error occurred: " + e.getMessage());
+             }
+         }
+     }
 
-    private void displayMenu() {
-        System.out.println("\nGame Vault CLI Menu:");
-        System.out.println("Current User: " + (currentUser != null ? currentUser.getUsername() : "Not logged in")); // Show current user
-        System.out.println("1. Create User");
-        System.out.println("2. Create Game");
-        System.out.println("3. Add Game to Cart");
-        System.out.println("4. Place Order");
-        //System.out.println("5. Create Transaction"); //No Longer Creating Transactions
-        System.out.println("6. List Games");
-        System.out.println("7. List Users");
-        System.out.println("8. View Orders");
-        System.out.println("9. View Transactions");
-        System.out.println("10. Login");
-        System.out.println("11. Logout");
-        System.out.println("0. Exit");
-        System.out.print("Enter your choice: ");
-    }
+     private void displayMenu() {
+         System.out.println("\nGame Vault CLI Menu:");
+         System.out.println("Current User: " + (currentUser != null ? currentUser.getUsername() : "Not logged in")); // Show current user
+         System.out.println("1. Create User");
+         System.out.println("2. Create Game");
+         System.out.println("3. Add Game to Cart");
+         System.out.println("4. Place Order");
+         System.out.println("5. View Cart");
+         System.out.println("6. List Games");
+         System.out.println("7. List Users");
+         System.out.println("8. View Orders");
+         System.out.println("9. View Transactions");
+         System.out.println("10. Login");
+         System.out.println("11. Logout");
+         System.out.println("0. Exit");
+         System.out.print("Enter your choice: ");
+     }
 
-    private void createUser() {
-        try {
-            System.out.print("Enter email: ");
-            String email = scanner.nextLine();
-            System.out.print("Enter password: ");
-            String password = scanner.nextLine();
-            System.out.print("Enter username: ");
-            String username = scanner.nextLine();
-            System.out.print("Enter wallet balance: ");
-            float walletBalance = scanner.nextFloat();
-            scanner.nextLine(); // Consume newline
+     private void createUser() {
+         try {
+             System.out.print("Enter email: ");
+             String email = scanner.nextLine();
+             System.out.print("Enter password: ");
+             String password = scanner.nextLine();
+             System.out.print("Enter username: ");
+             String username = scanner.nextLine();
+             System.out.print("Enter wallet balance: ");
+             float walletBalance = scanner.nextFloat();
+             scanner.nextLine(); // Consume newline
 
-            User user = new User(email, password, username, walletBalance);
-            userManagement.addUser(user);
-            System.out.println("User created: " + user.getUsername() + " with ID: " + user.getUserId());
-        } catch (Exception e) {
-            System.out.println("Error creating user: " + e.getMessage());
-        }
-    }
+             User user = new User(email, password, username, walletBalance);
+             userManagement.addUser(user);
+             System.out.println("User created: " + user.getUsername() + " with ID: " + user.getUserId());
+         } catch (Exception e) {
+             System.out.println("Error creating user: " + e.getMessage());
+         }
+     }
 
-    private void createGame() {
-        try {
-            System.out.print("Enter game title: ");
-            String title = scanner.nextLine();
-            System.out.print("Enter game description: ");
-            String description = scanner.nextLine();
-            System.out.print("Enter game developer: ");
-            String developer = scanner.nextLine();
-            System.out.print("Enter game platform: ");
-            String platform = scanner.nextLine();
-            System.out.print("Enter game price: ");
-            float price = scanner.nextFloat();
-            scanner.nextLine(); // Consume newline
+     private void createGame() {
+         try {
+             System.out.print("Enter game title: ");
+             String title = scanner.nextLine();
+             System.out.print("Enter game description: ");
+             String description = scanner.nextLine();
+             System.out.print("Enter game developer: ");
+             String developer = scanner.nextLine();
+             System.out.print("Enter game platform: ");
+             String platform = scanner.nextLine();
+             System.out.print("Enter game price: ");
+             float price = scanner.nextFloat();
+             scanner.nextLine(); // Consume newline
 
-            Game game = new Game(title, description, developer, platform, price, new java.util.Date());
-            gameManagement.addGame(game);
-            System.out.println("Game created: " + game.getTitle() + " with ID: " + game.getGameId());
-        } catch (Exception e) {
-            System.out.println("Error creating game: " + e.getMessage());
-        }
-    }
-
-    private void addGameToCart() {
+             Game game = new Game(title, description, developer, platform, price, new java.util.Date());
+             gameManagement.addGame(game);
+             System.out.println("Game created: " + game.getTitle() + " with ID: " + game.getGameId());
+         } catch (Exception e) {
+             System.out.println("Error creating game: " + e.getMessage());
+         }
+     }
+   private void addGameToCart() {
         if (currentUser == null) {
             System.out.println("Please log in first.");
             return;
@@ -188,28 +186,29 @@ public class GameVaultMenu {
             System.out.println("Error placing order: " + e.getMessage());
         }
     }
+    private void viewCart() {
+           if (currentUser == null) {
+               System.out.println("Please log in first.");
+               return;
+           }
 
-    //private void createTransaction() {
-    //    try {
-    //        System.out.print("Enter User ID: ");
-    //        int userId = scanner.nextInt();
-    //        scanner.nextLine(); // Consume newline
-    //        System.out.print("Enter Game ID: ");
-    //        int gameId = scanner.nextInt();
-    //        scanner.nextLine(); // Consume newline
-    //        System.out.print("Enter Transaction Type: ");
-    //        String transactionType = scanner.nextLine();
-    //        System.out.print("Enter Amount: ");
-    //        Float amount = scanner.nextFloat();
-    //        scanner.nextLine(); // Consume newline
+           try {
+               List<Game> gamesInCart = cartManagement.getGamesInCart(currentUser.getUserId());
+               System.out.println("\n--- Games in Cart ---");
 
-    //        transactionManagement.addTransaction(new Transaction(3, userId, gameId, transactionType, amount, java.time.LocalDateTime.now()));
-    //        System.out.println("Transaction created");
-    //    } catch (Exception e) {
-    //        System.out.println("Error creating Transaction: " + e.getMessage());
-    //    }
-    //}
-
+               if (gamesInCart.isEmpty()) {
+                   System.out.println("Your cart is empty.");
+               } else {
+                   List<String> columnNames = Arrays.asList("gameId", "title", "developer", "platform", "price", "description");
+                   Util.printTable(gamesInCart, columnNames);
+               }
+           } catch (CartEmptyException e) {
+               System.out.println("Your cart is empty.");
+           }
+           catch (Exception e) {
+               System.out.println("Error viewing cart: " + e.getMessage());
+           }
+       }
     private void listGames() {
         try {
             List<Game> games = gameManagement.getAllGames();
