@@ -5,26 +5,73 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class DBUtil {
 
     private static Connection connection;
 
+    // Hardcoded part of the URL (up to the database name)
+    private static final String DB_BASE_URL = "jdbc:mysql://localhost:3306/";
+
+    // Static variable to store the database name (only ask once)
+    private static String databaseName = null;
+    private static String databaseUsername = null;
+    private static String databasePassword = null;
+
+    // Method to get the database name from the user (called only once)
+    private static String getDatabaseNameFromUser() {
+        if (databaseName == null) { // Ask only if databaseName is not already set
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter the database name to use or create: ");
+            databaseName = scanner.nextLine(); // Store the database name
+        }
+        return databaseName;
+    }
+
+
     public static Connection getConnection() throws SQLException, IOException {
         if (connection == null || connection.isClosed()) {
+            String user;
+            String password;
+            if (databaseUsername == null || databasePassword == null) {
+                Scanner scanner = new Scanner(System.in);
+                System.out.print("Enter database username: ");
+                databaseUsername = scanner.nextLine();
+                System.out.print("Enter database password: ");
+                databasePassword = scanner.nextLine();
+                user = databaseUsername;
+                password = databasePassword;
+
+            } else {
+                 user = databaseUsername;
+                 password = databasePassword;
+            }
+
+            // Get database name from the user
+            String databaseName = getDatabaseNameFromUser();
+
+            // Construct the full database URL
+            String url = DB_BASE_URL + databaseName;
+
             Properties dbProps = CredentialUtil.getDBProperties();
-            String url = dbProps.getProperty("db.url");
-            String user = dbProps.getProperty("db.user");
-            String password = dbProps.getProperty("db.password");
+
 
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver"); // Load the MySQL driver
+
+                // Create the database if it doesn't exist
+                createDatabaseIfNotExist(databaseName, user, password);
+
                 connection = DriverManager.getConnection(url, user, password);
-                System.out.println("Database connection established.");
+                System.out.println("Database connection established to: " + databaseName);
                 createTablesIfNotExist();
             } catch (ClassNotFoundException e) {
                 System.err.println("MySQL JDBC driver not found. Make sure it's in your classpath.");
                 throw new SQLException("MySQL JDBC driver not found", e);
+            }
+             catch (SQLException e) {
+                System.err.println("Error creating database: " + e.getMessage());
             }
         }
         return connection;
@@ -41,6 +88,25 @@ public class DBUtil {
         }
     }
 
+    // Method to create the database if it doesn't exist
+    private static boolean createDatabaseIfNotExist(String databaseName, String user, String password) throws SQLException, IOException {
+        String urlWithoutDatabase = DB_BASE_URL;
+
+
+        try (Connection connectionWithoutDatabase = DriverManager.getConnection(urlWithoutDatabase, user, password);
+             Statement statement = connectionWithoutDatabase.createStatement()) {
+
+            String sqlCreateDatabase = "CREATE DATABASE IF NOT EXISTS " + databaseName;
+            statement.executeUpdate(sqlCreateDatabase);
+            // System.out.println("Database created or already exists: " + databaseName); remove
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println("Error creating database: " + e.getMessage());
+            return false;
+        }
+    }
+
     private static void createTablesIfNotExist() throws SQLException, IOException {
         try (Statement statement = getConnection().createStatement()) {
             statement.executeUpdate(SQL_CREATE_USERS_TABLE);
@@ -49,7 +115,7 @@ public class DBUtil {
             statement.executeUpdate(SQL_CREATE_CART_ITEMS_TABLE); // Added this
             statement.executeUpdate(SQL_CREATE_ORDERS_TABLE);
             statement.executeUpdate(SQL_CREATE_TRANSACTIONS_TABLE);
-            System.out.println("Tables created or already exist.");
+            //System.out.println("Tables created or already exist."); remove
         }
     }
 
@@ -83,8 +149,8 @@ public class DBUtil {
         }
     }
 
-     //Helper function to execute an insert and return generated keys
-     public static ResultSet executeInsert(String sql, Object... params) throws SQLException, IOException {
+    //Helper function to execute an insert and return generated keys
+    public static ResultSet executeInsert(String sql, Object... params) throws SQLException, IOException {
         PreparedStatement pstmt = getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         for (int i = 0; i < params.length; i++) {
             pstmt.setObject(i + 1, params[i]);
