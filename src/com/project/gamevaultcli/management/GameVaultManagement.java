@@ -31,6 +31,9 @@ public class GameVaultManagement {
             userManagement.addUser(user1);
             User user2 = new User("naruto@gmail.com", "believeit", "Naruto", 100.0f);
             userManagement.addUser(user2);
+            User user3 = new User("admin@gmail.com", "admin", "admin", 10000.0f);
+            userManagement.addUser(user3);
+
 
             // Predefined Games
             Game game1 = new Game("Spider-Man Remastered", "Game created ?? lol lorem ipsum or wot", "Insomniac Games", "PC", 52.3f, new Date());
